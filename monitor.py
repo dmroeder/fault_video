@@ -25,16 +25,19 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
     read = True
     while read:
         try:
+            # read the tag
             ret = comm.Read(config.fault_tag)
             time.sleep(1)
             if ret.Value:
+                # if it's true, save the fault
                 FaultHappend(cameras)
                 while ret.Value:
+                    # wait here until it is false 
                     ret = comm.Read(config.fault_tag)
                     time.sleep(1)
         except KeyboardInterrupt:
             for c in cameras:
+                # stop all cameras on exit
                 c.stop()
-            print('exiting')
             read = False
 
