@@ -22,7 +22,7 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
         cam.cam_id = k
         cam.start()
         cameras.append(cam)
-    
+
     read = True
 
     if not os.path.isdir('output'):
@@ -36,6 +36,11 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
             if ret.Value:
                 # if it's true, save the fault
                 FaultHappend(cameras)
+
+                # write the fault tag back to 0
+                if config.acknowledge:
+                    comm.Write(config.fault_tag, False)
+
                 while ret.Value:
                     # wait here until it is false 
                     ret = comm.Read(config.fault_tag)
