@@ -1,5 +1,6 @@
 import config
 import datetime
+import os
 import pylogix
 import time
 
@@ -23,6 +24,10 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
         cameras.append(cam)
     
     read = True
+
+    if not os.path.isdir('output'):
+        os.mkdir("output")
+
     while read:
         try:
             # read the tag
