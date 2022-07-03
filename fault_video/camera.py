@@ -23,6 +23,7 @@ class Camera(threading.Thread):
         Capture frames and save them in a buffer of
         maximum size
         """
+        print("Press CTRL+C to exit")
         self.cap = cv2.VideoCapture(self.camera)
         time.sleep(2)
         self.loop = True
@@ -44,7 +45,7 @@ class Camera(threading.Thread):
         date = now.strftime("%Y%m%d_%H.%M.%S")
         date = "output/{} - {}".format(self.cam_id, date)
         fn = "{}.mp4".format(date)
-        writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 20.0, (640,480))
+        writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 20.0, config.resolution)
         for frame in buffer:
             writer.write(frame)
         writer.release()
