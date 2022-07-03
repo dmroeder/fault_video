@@ -15,7 +15,8 @@ frame_rate = 300
 # camera dictionary.  ID:path
 # the path can be an integer for local webcams or
 # a web address for IP cameras
-cameras = {0: 0}
+cameras = {0: 0,
+           1: 1}
 
 # define the image resolution
 resolution = (640, 480)

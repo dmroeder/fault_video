@@ -23,7 +23,6 @@ class Camera(threading.Thread):
         Capture frames and save them in a buffer of
         maximum size
         """
-        print("Press CTRL+C to exit")
         self.cap = cv2.VideoCapture(self.camera)
         time.sleep(2)
         self.loop = True

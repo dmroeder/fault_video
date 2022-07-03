@@ -23,11 +23,11 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
         cam.start()
         cameras.append(cam)
 
-    read = True
-
     if not os.path.isdir('output'):
         os.mkdir("output")
 
+    print("\nPress CTRL+C to exit")
+    read = True
     while read:
         try:
             # read the tag
