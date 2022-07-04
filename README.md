@@ -13,3 +13,6 @@ will be an integer.  In my case, I have a built in webcam and a USB camera, they
 0 and 1 respectively.  My particular model of IP camera is at the path:
 rtsp://ip_address/streaming/channels/1.  See your manufactures documentation for your specific
 cameras path.
+
+The result will be mp4's saved in the output directory, name will be camera number defined in
+the camera config and the time stamp.  For example: "0 - 20220703_09.31.58.mp4"
