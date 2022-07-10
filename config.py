@@ -18,6 +18,12 @@ frame_rate = 300
 cameras = {0: 0,
            1: 1}
 
+# example of also mapping a local webcam and an
+# IP camera.  Every camera model has unique paths,
+# check the manual for the camera for the path
+#cameras = {0: 0,
+#           1: "rtsp://192.168.1.90/streaming/channels/1"}
+
 # define the image resolution
 resolution = (640, 480)
 
