@@ -32,7 +32,7 @@ class Monitor(object):
 
         # create output directory if it does not exist
         try:
-            self.create_directories(test)
+            self.create_directories()
         except:
             self.read = False
 
@@ -96,7 +96,36 @@ class Monitor(object):
         """
         for camera in self.cameras:
             camera.save()
+
+        self.get_newest_videos()
         return
+
+    def get_files(self, path, ext='', sort=False):
+        """
+        gets all files in a path. Files can be
+        filtered and sorted.
+        """
+        files = []
+        for f in os.listdir(path):
+            if f.endswith(ext):
+                files.append(f)
+        if sort:
+            return sorted(files, reverse=True)
+        else:
+            return files
+
+    def get_newest_videos(self):
+
+        vids = []
+        for camera in self.cameras:
+            path = "output/{}/".format(camera.cam_id)
+            files = self.get_files(path, ext=".mp4", sort=True)
+            if files:
+                s = "{}{}".format(path, files[0])
+                vids.append(os.path.normpath(s))
+
+        return
+
 
 
 if __name__ == "__main__":
