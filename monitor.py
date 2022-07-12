@@ -10,6 +10,7 @@ def fault_occured(c):
     # this should get called once.
     for camera in c:
         camera.save()
+    return
 
 def create_directories(cams):
     """
@@ -23,12 +24,16 @@ def create_directories(cams):
         if not os.path.isdir("output/{}".format(c.cam_id)):
             os.mkdir("output/{}".format(c.cam_id))
 
+    return
+
 def close_cameras(cams):
     for c in cams:
         # stop all cameras on exit
         c.stop()
+    return
 
 with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
+
     cameras = []
 
     # create a camera thread for each camera that was
