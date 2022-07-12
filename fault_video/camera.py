@@ -16,7 +16,6 @@ class Camera(threading.Thread):
         self.cap = None
         self.frame = None
         self.loop = False
-        #self.max_frames = config.frame_count
         self._max_frames = int(config.video_length * 30)
 
     def run(self):

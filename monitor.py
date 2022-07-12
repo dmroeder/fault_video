@@ -23,6 +23,7 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
         cam.start()
         cameras.append(cam)
 
+    # create output directory if it does not exist
     if not os.path.isdir('output'):
         os.mkdir("output")
 
