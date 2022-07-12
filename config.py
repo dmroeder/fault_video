@@ -10,19 +10,19 @@ fault_tag = "h_Global[5].Indicator"
 # the number of frames to be stored in the buffer
 # the length of video depends on the frame rate.
 # For me, 300 gives ~15 second video
-frame_rate = 300
+frame_count = 300
 
 # camera dictionary.  ID:path
 # the path can be an integer for local webcams or
 # a web address for IP cameras
-cameras = {0: 0,
-           1: 1}
+# cameras = {0: 0,
+#            1: 1}
 
 # example of also mapping a local webcam and an
 # IP camera.  Every camera model has unique paths,
 # check the manual for the camera for the path
-#cameras = {0: 0,
-#           1: "rtsp://192.168.1.90/streaming/channels/1"}
+cameras = {0: 1,
+           1: "rtsp://192.168.1.91/streaming/channels/1"}
 
 # define the image resolution
 resolution = (640, 480)

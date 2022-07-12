@@ -16,7 +16,7 @@ class Camera(threading.Thread):
         self.cap = None
         self.frame = None
         self.loop = False
-        self.max_frames = config.frame_rate
+        #self.max_frames = config.frame_count
 
     def run(self):
         """
@@ -30,7 +30,7 @@ class Camera(threading.Thread):
         while self.loop:
             self.frame = self.cap.read()[1]
 
-            if len(self.buffer) > self.max_frames:
+            if len(self.buffer) > config.frame_count:
                 self.buffer = self.buffer[1:] + [self.frame]
             else:
                 self.buffer += [self.frame]
@@ -44,7 +44,7 @@ class Camera(threading.Thread):
         date = now.strftime("%Y%m%d_%H.%M.%S")
         date = "output/{} - {}".format(self.cam_id, date)
         fn = "{}.mp4".format(date)
-        writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 20.0, config.resolution)
+        writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 30.0, config.resolution)
         for frame in buffer:
             writer.write(frame)
         writer.release()
