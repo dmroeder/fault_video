@@ -23,6 +23,10 @@ def create_directories(cams):
         if not os.path.isdir("output/{}".format(c.cam_id)):
             os.mkdir("output/{}".format(c.cam_id))
 
+def close_cameras(cams):
+    for c in cams:
+        # stop all cameras on exit
+        c.stop()
 
 with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
     cameras = []
@@ -59,8 +63,9 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
                     ret = comm.Read(config.fault_tag)
                     time.sleep(1)
         except KeyboardInterrupt:
-            for c in cameras:
-                # stop all cameras on exit
-                c.stop()
+            close_cameras(cameras)
+            read = False
+        except:
+            close_cameras(cameras)
             read = False
 
