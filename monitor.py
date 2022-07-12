@@ -11,6 +11,19 @@ def FaultHappend(c):
     for camera in c:
         camera.save()
 
+def create_directories(cams):
+    """
+    Create an output directory and camera directories
+    if they do not already exist
+    """
+    if not os.path.isdir("output"):
+        os.mkdir("output")
+
+    for c in cams:
+        if not os.path.isdir("output/{}".format(c.cam_id)):
+            os.mkdir("output/{}".format(c.cam_id))
+
+
 with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
     cameras = []
 
@@ -24,8 +37,7 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
         cameras.append(cam)
 
     # create output directory if it does not exist
-    if not os.path.isdir('output'):
-        os.mkdir("output")
+    create_directories(cameras)
 
     print("\nPress CTRL+C to exit")
     read = True
