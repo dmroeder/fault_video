@@ -17,6 +17,7 @@ class Camera(threading.Thread):
         self.frame = None
         self.loop = False
         #self.max_frames = config.frame_count
+        self._max_frames = int(config.video_length * 30)
 
     def run(self):
         """
@@ -30,7 +31,7 @@ class Camera(threading.Thread):
         while self.loop:
             self.frame = self.cap.read()[1]
 
-            if len(self.buffer) > config.frame_count:
+            if len(self.buffer) > self._max_frames:
                 self.buffer = self.buffer[1:] + [self.frame]
             else:
                 self.buffer += [self.frame]
