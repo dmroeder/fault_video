@@ -6,71 +6,95 @@ import time
 
 from fault_video.camera import Camera
 
-def fault_occured(c):
-    # this should get called once.
-    for camera in c:
-        camera.save()
-    return
 
-def create_directories(cams):
-    """
-    Create an output directory and camera directories
-    if they do not already exist
-    """
-    if not os.path.isdir("output"):
-        os.mkdir("output")
+class Monitor(object):
 
-    for c in cams:
-        if not os.path.isdir("output/{}".format(c.cam_id)):
-            os.mkdir("output/{}".format(c.cam_id))
+    def __init__(self):
+        self.cameras = []
+        self.comm = None
+        self.read = True
 
-    return
+        self.setup()
+        self.run()
 
-def close_cameras(cams):
-    for c in cams:
-        # stop all cameras on exit
-        c.stop()
-    return
+    def setup(self):
+        """
+        Setup for monitoring
+        """
+        # create a camera thread for each camera that was
+        # defined in the config
+        for k,v in config.cameras.items():
+            cam = Camera()
+            cam.camera = v
+            cam.cam_id = k
+            cam.start()
+            self.cameras.append(cam)
 
-with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
+        # create output directory if it does not exist
+        self.create_directories()
 
-    cameras = []
+    def run(self):
+        """
+        Loop, monitoring for faults
+        """
+        with pylogix.PLC(config.plc_ip, config.plc_slot) as self.comm:
+            print("\nPress CTRL+C to exit")
 
-    # create a camera thread for each camera that was
-    # defined in the config
-    for k,v in config.cameras.items():
-        cam = Camera()
-        cam.camera = v
-        cam.cam_id = k
-        cam.start()
-        cameras.append(cam)
-
-    # create output directory if it does not exist
-    create_directories(cameras)
-
-    print("\nPress CTRL+C to exit")
-    read = True
-    while read:
-        try:
-            # read the tag
-            ret = comm.Read(config.fault_tag)
-            time.sleep(1)
-            if ret.Value:
-                # if it's true, save the fault
-                fault_occured(cameras)
-
-                # write the fault tag back to 0
-                if config.acknowledge:
-                    comm.Write(config.fault_tag, False)
-
-                while ret.Value:
-                    # wait here until it is false 
-                    ret = comm.Read(config.fault_tag)
+            while self.read:
+                try:
+                    # read the tag
+                    ret = self.comm.Read(config.fault_tag)
                     time.sleep(1)
-        except KeyboardInterrupt:
-            close_cameras(cameras)
-            read = False
-        except:
-            close_cameras(cameras)
-            read = False
+                    if ret.Value:
+                        # if it's true, save the fault
+                        self.fault_occured()
 
+                        # write the fault tag back to 0
+                        if config.acknowledge:
+                            self.comm.Write(config.fault_tag, False)
+
+                        while ret.Value:
+                            # wait here until it is false 
+                            ret = self.comm.Read(config.fault_tag)
+                            time.sleep(1)
+                except KeyboardInterrupt:
+                    self.close_cameras()
+                    self.read = False
+                except:
+                    self.close_cameras()
+                    self.read = False
+
+    def close_cameras(self):
+        """
+        Close all cameras
+        """
+        for camera in self.cameras:
+            # stop all cameras on exit
+            camera.stop()
+        return
+
+    def create_directories(self):
+        """
+        Create an output directory and camera directories
+        if they do not already exist
+        """
+        if not os.path.isdir("output"):
+            os.mkdir("output")
+
+        for camera in self.cameras:
+            if not os.path.isdir("output/{}".format(camera.cam_id)):
+                os.mkdir("output/{}".format(camera.cam_id))
+
+        return
+
+    def fault_occured(self):
+        """
+        Fault occured, trigger a video save
+        """
+        for camera in self.cameras:
+            camera.save()
+        return
+
+
+if __name__ == "__main__":
+    x = Monitor()
