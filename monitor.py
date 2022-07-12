@@ -115,7 +115,9 @@ class Monitor(object):
             return files
 
     def get_newest_videos(self):
-
+        """
+        Get the newest video files for each camera
+        """
         vids = []
         for camera in self.cameras:
             path = "output/{}/".format(camera.cam_id)
@@ -124,8 +126,24 @@ class Monitor(object):
                 s = "{}{}".format(path, files[0])
                 vids.append(os.path.normpath(s))
 
+        self.purge_old_videos()
         return
 
+    def purge_old_videos(self):
+        """
+        Clear out older videos.  Max number of videos is defined
+        in the config file
+        """
+        paths = ["output/{}/".format(camera.cam_id) for camera in self.cameras]
+        for p in paths:
+            p = os.path.abspath(p)
+            if os.path.isdir(p):
+                files = os.listdir(p)
+                files.sort(reverse=True)
+                excess = files[config.max_files:]
+                if excess:
+                    for e in excess:
+                        os.remove("{}/{}".format(p, e))
 
 
 if __name__ == "__main__":

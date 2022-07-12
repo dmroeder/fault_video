@@ -31,3 +31,7 @@ resolution = (640, 480)
 # acknowledge flag.  If true, we'll write your fault_tag
 # back to 0 after fault is recorded
 acknowledge = True
+
+# maximum number videos to keep for each camera.
+# the oldest files will be purged
+max_files = 50
