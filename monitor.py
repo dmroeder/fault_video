@@ -6,7 +6,7 @@ import time
 
 from fault_video.camera import Camera
 
-def FaultHappend(c):
+def fault_occured(c):
     # this should get called once.
     for camera in c:
         camera.save()
@@ -48,7 +48,7 @@ with pylogix.PLC(config.plc_ip, config.plc_slot) as comm:
             time.sleep(1)
             if ret.Value:
                 # if it's true, save the fault
-                FaultHappend(cameras)
+                fault_occured(cameras)
 
                 # write the fault tag back to 0
                 if config.acknowledge:
