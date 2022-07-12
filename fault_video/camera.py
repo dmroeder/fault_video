@@ -12,10 +12,11 @@ class Camera(threading.Thread):
         
         self.cam_id = 0
         self.camera = 0
-        self.buffer = []
-        self.cap = None
-        self.frame = None
-        self.loop = False
+        
+        self._buffer = []
+        self._cap = None
+        self._frame = None
+        self._loop = False
         self._max_frames = int(config.video_length * 30)
 
     def run(self):
@@ -23,23 +24,23 @@ class Camera(threading.Thread):
         Capture frames and save them in a buffer of
         maximum size
         """
-        self.cap = cv2.VideoCapture(self.camera)
+        self._cap = cv2.VideoCapture(self.camera)
         time.sleep(2)
-        self.loop = True
+        self._loop = True
 
-        while self.loop:
-            self.frame = self.cap.read()[1]
+        while self._loop:
+            self._frame = self._cap.read()[1]
 
-            if len(self.buffer) > self._max_frames:
-                self.buffer = self.buffer[1:] + [self.frame]
+            if len(self._buffer) > self._max_frames:
+                self._buffer = self._buffer[1:] + [self._frame]
             else:
-                self.buffer += [self.frame]
+                self._buffer += [self._frame]
 
     def save(self):
         """
         Save the buffer to a video
         """
-        buffer = self.buffer
+        buffer = self._buffer
         now = datetime.datetime.now()
         date = now.strftime("%Y%m%d_%H.%M.%S")
         date = "output/{}/{}".format(self.cam_id, date)
@@ -53,7 +54,7 @@ class Camera(threading.Thread):
         """
         Stop our thread, clean up
         """
-        self.loop = False
+        self._loop = False
         time.sleep(0.5)
-        self.cap.release()
+        self._cap.release()
         cv2.destroyAllWindows()
