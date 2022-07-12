@@ -6,12 +6,13 @@ import time
 
 class Camera(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, parent):
 
         threading.Thread.__init__(self)
         
         self.cam_id = 0
         self.camera = 0
+        self.parent = parent
         
         self._buffer = []
         self._cap = None
@@ -29,6 +30,8 @@ class Camera(threading.Thread):
         self._loop = True
 
         while self._loop:
+            if self.parent.read == False:
+                self.stop()
             self._frame = self._cap.read()[1]
 
             if len(self._buffer) > self._max_frames:

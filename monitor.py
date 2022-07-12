@@ -24,14 +24,17 @@ class Monitor(object):
         # create a camera thread for each camera that was
         # defined in the config
         for k,v in config.cameras.items():
-            cam = Camera()
+            cam = Camera(self)
             cam.camera = v
             cam.cam_id = k
             cam.start()
             self.cameras.append(cam)
 
         # create output directory if it does not exist
-        self.create_directories()
+        try:
+            self.create_directories(test)
+        except:
+            self.read = False
 
     def run(self):
         """
