@@ -16,7 +16,7 @@ class Monitor(object):
         self.comm = None
         self.read = True
 
-        self.handler = logging.handlers.WatchedFileHandler(os.environ.get("LOGFILE", "output/logjammin.log"))
+        self.handler = logging.handlers.RotatingFileHandler('output/logjammin.log', maxBytes=500, backupCount=5)
         self.formatter = logging.Formatter(fmt="%(asctime)s  %(levelname)s: %(message)s")
         self.handler.setFormatter(self.formatter)
         self.root = logging.getLogger()
