@@ -44,6 +44,21 @@ class Monitor(object):
         with pylogix.PLC(config.plc_ip, config.plc_slot) as self.comm:
             print("\nPress CTRL+C to exit")
 
+            # read the tag, if it is true initially, hang here
+            # until it is false.  We don't want to save a clip if
+            # there is a fault on startup
+            ret = self.comm.Read(config.fault_tag)
+            try:
+                while ret.Value:
+                    time.sleep(1)
+                    # write the fault tag back to 0
+                    if config.acknowledge:
+                        self.comm.Write(config.fault_tag, False)
+                    #try:
+                    ret = self.comm.Read(config.fault_tag)
+            except:
+                self.read = False
+
             while self.read:
                 try:
                     # read the tag
