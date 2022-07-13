@@ -1,5 +1,7 @@
 import config
 import datetime
+import logging
+import logging.handlers
 import os
 import pylogix
 import time
@@ -14,6 +16,13 @@ class Monitor(object):
         self.comm = None
         self.read = True
 
+        self.handler = logging.handlers.WatchedFileHandler(os.environ.get("LOGFILE", "output/logjammin.log"))
+        self.formatter = logging.Formatter(fmt="%(asctime)s  %(levelname)s: %(message)s")
+        self.handler.setFormatter(self.formatter)
+        self.root = logging.getLogger()
+        self.root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
+        self.root.addHandler(self.handler)
+
         self.setup()
         self.run()
 
@@ -24,6 +33,7 @@ class Monitor(object):
         # create a camera thread for each camera that was
         # defined in the config
         for k,v in config.cameras.items():
+            logging.info("Adding camera {} - {}".format(v, k))
             cam = Camera(self)
             cam.camera = v
             cam.cam_id = k
@@ -34,6 +44,7 @@ class Monitor(object):
         try:
             self.create_directories()
         except:
+            logging.error("Failed to setup directories")
             self.read = False
 
     def run(self):
@@ -42,6 +53,7 @@ class Monitor(object):
         """
         with pylogix.PLC(config.plc_ip, config.plc_slot) as self.comm:
             print("\nPress CTRL+C to exit")
+            logging.info("Starting monitor, pylogix v{}".format(pylogix.__version__))
 
             while self.read:
                 try:
@@ -61,9 +73,11 @@ class Monitor(object):
                             ret = self.comm.Read(config.fault_tag)
                             time.sleep(1)
                 except KeyboardInterrupt:
+                    logging.warning("Keyboard interrupt")
                     self.close_cameras()
                     self.read = False
-                except:
+                except Exception as e:
+                    logging.error("Monitor crashed... {}".format(e))
                     self.close_cameras()
                     self.read = False
 
@@ -71,6 +85,7 @@ class Monitor(object):
         """
         Close all cameras
         """
+        logging.info("Closing cameras")
         for camera in self.cameras:
             # stop all cameras on exit
             camera.stop()
@@ -82,10 +97,12 @@ class Monitor(object):
         if they do not already exist
         """
         if not os.path.isdir("output"):
+            logging.info("Output directory did not exist, creating now")
             os.mkdir("output")
 
         for camera in self.cameras:
             if not os.path.isdir("output/{}".format(camera.cam_id)):
+                logging.info("Creating directory for camera id {}".format(camera.cam_id))
                 os.mkdir("output/{}".format(camera.cam_id))
 
         return
@@ -94,6 +111,7 @@ class Monitor(object):
         """
         Fault occured, trigger a video save
         """
+        logging.info("New fault occured, saving video buffers")
         for camera in self.cameras:
             camera.save()
 
@@ -142,7 +160,9 @@ class Monitor(object):
                 files.sort(reverse=True)
                 excess = files[config.max_files:]
                 if excess:
+                    logging.info("Max videos exceeded, purging {}".format(e))
                     for e in excess:
+                        logging.info("Max videos exceeded, purging {}".format(e))
                         os.remove("{}/{}".format(p, e))
 
 
