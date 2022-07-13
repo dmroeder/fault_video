@@ -46,8 +46,7 @@ class Camera(threading.Thread):
         buffer = self._buffer
         now = datetime.datetime.now()
         date = now.strftime("%Y%m%d_%H.%M.%S")
-        date = "output/{}/{}".format(self.cam_id, date)
-        fn = "{}.mp4".format(date)
+        fn = "output/{}/{}.mp4".format(self.cam_id, date)
         writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 30.0, config.resolution)
         for frame in buffer:
             writer.write(frame)
