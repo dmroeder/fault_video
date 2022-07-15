@@ -5,7 +5,7 @@ plc_ip = "192.168.1.10"
 plc_slot = 0
 
 # BOOL tag that is 1 when a fault is present
-fault_tag = "h_Global[5].Indicator"
+fault_tag = "fault_detected"
 
 # specify the desired video length (seconds).
 # this will determine the number of frames to be
