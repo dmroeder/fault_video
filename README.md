@@ -30,4 +30,8 @@ Raspberry Pi 4, it performed reasonably well.
 * opencv-python
 * pylogix
 
+To run, make sure you setup your configuration file, then:
+```console
+pylogix@pylogix-kde:~$ python monitor.py
+```
 
