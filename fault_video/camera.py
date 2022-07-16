@@ -9,6 +9,7 @@ class Camera(threading.Thread):
     def __init__(self, parent):
 
         threading.Thread.__init__(self)
+        self.daemon = True
         
         self.cam_id = 0
         self.camera = 0
@@ -29,6 +30,12 @@ class Camera(threading.Thread):
         time.sleep(2)
         self._loop = True
 
+        if not self._cap.isOpened():
+            self.parent.log("error", "Failed to open camera {}".format(self.camera))
+            self._loop = False
+        else:
+            self.parent.log("info", "Camera {} started".format(self.camera))
+
         while self._loop:
             if self.parent.read == False:
                 self.stop()
@@ -48,6 +55,7 @@ class Camera(threading.Thread):
         date = now.strftime("%Y%m%d_%H.%M.%S")
         fn = "output/{}/{}.mp4".format(self.cam_id, date)
         writer = cv2.VideoWriter(fn, cv2.VideoWriter_fourcc(*"mp4v"), 30.0, config.resolution)
+        self.parent.log("info", "Saving file {}".format(fn))
         for frame in buffer:
             writer.write(frame)
         writer.release()
@@ -58,5 +66,8 @@ class Camera(threading.Thread):
         """
         self._loop = False
         time.sleep(0.5)
-        self._cap.release()
+        try:
+            self._cap.release()
+        except:
+            pass
         cv2.destroyAllWindows()

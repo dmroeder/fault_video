@@ -18,8 +18,11 @@
 
 import config
 import datetime
+import logging
+import logging.handlers
 import os
 import pylogix
+import sys
 import time
 
 from fault_video.camera import Camera
@@ -32,6 +35,13 @@ class Monitor(object):
         self.comm = None
         self.read = True
 
+        self.handler = logging.handlers.RotatingFileHandler('output/logjammin.log', maxBytes=500, backupCount=3)
+        self.formatter = logging.Formatter(fmt="%(asctime)s  %(levelname)s: %(message)s")
+        self.handler.setFormatter(self.formatter)
+        self.root = logging.getLogger()
+        self.root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
+        self.root.addHandler(self.handler)
+
         self.setup()
         self.run()
 
@@ -42,6 +52,7 @@ class Monitor(object):
         # create a camera thread for each camera that was
         # defined in the config
         for k,v in config.cameras.items():
+            self.log("info", "Adding camera {} - {}".format(v, k))
             cam = Camera(self)
             cam.camera = v
             cam.cam_id = k
@@ -52,6 +63,7 @@ class Monitor(object):
         try:
             self.create_directories()
         except:
+            self.log("error", "Failed to create directories")
             self.read = False
         return
 
@@ -60,22 +72,26 @@ class Monitor(object):
         Loop, monitoring for faults
         """
         with pylogix.PLC(config.plc_ip, config.plc_slot) as self.comm:
+            self.log("info", "Starting PLC communications")
             print("\nPress CTRL+C to exit")
+
+            ret = self.comm.Read(config.fault_tag)
+            if ret.Status == "Success":
+                self.log("info", "Successfully connected to the PLC")
+            else:
+                self.log("error", "Pylogix error: {}".format(ret.Status))
+                self.read = False
 
             # read the tag, if it is true initially, hang here
             # until it is false.  We don't want to save a clip if
             # there is a fault on startup
-            ret = self.comm.Read(config.fault_tag)
-            try:
-                while ret.Value:
-                    time.sleep(1)
-                    # write the fault tag back to 0
-                    if config.acknowledge:
-                        self.comm.Write(config.fault_tag, False)
-                    #try:
-                    ret = self.comm.Read(config.fault_tag)
-            except:
-                self.read = False
+            while ret.Value == True:
+                time.sleep(1)
+                # write the fault tag back to 0
+                if config.acknowledge:
+                    self.comm.Write(config.fault_tag, False)
+
+                ret = self.comm.Read(config.fault_tag)
 
             while self.read:
                 try:
@@ -95,11 +111,28 @@ class Monitor(object):
                             ret = self.comm.Read(config.fault_tag)
                             time.sleep(1)
                 except KeyboardInterrupt:
-                    self.close_cameras()
+                    self.log("info", "Keyboard interrupt, shutting down")
                     self.read = False
                 except Exception as e:
-                    self.close_cameras()
+                    self.log("error", "Error occured: {}".format(e))
                     self.read = False
+
+        # if our loop exited, try to close the cameras
+        self.log("info", "Closing cameras")
+        self.close_cameras()
+        sys.exit(0)
+
+    def log(self, level, message):
+        """
+        Log messages to our log file
+        """
+        if level == "info":
+            logging.info(message)
+        elif level == "error":
+            logging.error(message)
+        elif level == "debug":
+            logging.debug(message)
+        return
 
     def close_cameras(self):
         """
