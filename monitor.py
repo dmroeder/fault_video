@@ -35,11 +35,11 @@ class Monitor(object):
         self.comm = None
         self.read = True
 
-        self.handler = logging.handlers.RotatingFileHandler('output/logjammin.log', maxBytes=500, backupCount=3)
+        self.handler = logging.handlers.RotatingFileHandler('output/logjammin.log', maxBytes=50000, backupCount=3)
         self.formatter = logging.Formatter(fmt="%(asctime)s  %(levelname)s: %(message)s")
         self.handler.setFormatter(self.formatter)
         self.root = logging.getLogger()
-        self.root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
+        self.root.setLevel(os.environ.get("LOGLEVEL", "DEBUG"))
         self.root.addHandler(self.handler)
 
         self.setup()
@@ -58,6 +58,14 @@ class Monitor(object):
             cam.cam_id = k
             cam.start()
             self.cameras.append(cam)
+
+        # log the configuration
+        self.log("debug", "PLC IP/Slot - {}/{}".format(config.plc_ip, config.plc_slot))
+        self.log("debug", "PLC Tag - {}".format(config.fault_tag))
+        self.log("debug", "Video Length - {}".format(config.video_length))
+        self.log("debug", "Resolution - {}x{}".format(*config.resolution))
+        self.log("debug", "Acknowledge flag - {}".format(config.acknowledge))
+        self.log("debug", "Max files - {}".format(config.max_files))
 
         # create output directory if it does not exist
         try:

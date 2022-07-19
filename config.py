@@ -22,7 +22,7 @@ video_length = 15
 # example of also mapping a local webcam and an
 # IP camera.  Every camera model has unique paths,
 # check the manual for the camera for the path
-cameras = {0: 0,
+cameras = {0: 1,
            1: "rtsp://192.168.1.91/streaming/channels/1"}
 
 # define the image resolution
