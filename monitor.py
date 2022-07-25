@@ -18,6 +18,7 @@
 
 import config
 import datetime
+import fault_video
 import logging
 import logging.handlers
 import os
@@ -49,6 +50,16 @@ class Monitor(object):
         """
         Setup for monitoring
         """
+        self.log("debug", "----------")
+        self.log("debug", "v{}".format(fault_video.__version__))
+        # log the configuration
+        self.log("debug", "PLC IP/Slot - {}/{}".format(config.plc_ip, config.plc_slot))
+        self.log("debug", "PLC Tag - {}".format(config.fault_tag))
+        self.log("debug", "Video Length - {}".format(config.video_length))
+        self.log("debug", "Resolution - {}x{}".format(*config.resolution))
+        self.log("debug", "Acknowledge flag - {}".format(config.acknowledge))
+        self.log("debug", "Max files - {}".format(config.max_files))
+
         # create a camera thread for each camera that was
         # defined in the config
         for k,v in config.cameras.items():
@@ -58,14 +69,6 @@ class Monitor(object):
             cam.cam_id = k
             cam.start()
             self.cameras.append(cam)
-
-        # log the configuration
-        self.log("debug", "PLC IP/Slot - {}/{}".format(config.plc_ip, config.plc_slot))
-        self.log("debug", "PLC Tag - {}".format(config.fault_tag))
-        self.log("debug", "Video Length - {}".format(config.video_length))
-        self.log("debug", "Resolution - {}x{}".format(*config.resolution))
-        self.log("debug", "Acknowledge flag - {}".format(config.acknowledge))
-        self.log("debug", "Max files - {}".format(config.max_files))
 
         # create output directory if it does not exist
         try:
