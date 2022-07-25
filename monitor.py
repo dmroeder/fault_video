@@ -94,7 +94,7 @@ class Monitor(object):
             # until it is false.  We don't want to save a clip if
             # there is a fault on startup
             while ret.Value == True:
-                time.sleep(1)
+                time.sleep(config.poll_rate)
                 # write the fault tag back to 0
                 if config.acknowledge:
                     self.comm.Write(config.fault_tag, False)
@@ -105,7 +105,7 @@ class Monitor(object):
                 try:
                     # read the tag
                     ret = self.comm.Read(config.fault_tag)
-                    time.sleep(1)
+                    time.sleep(config.poll_rate)
                     if ret.Value:
                         # if it's true, save the fault
                         self.fault_occured()
@@ -117,7 +117,7 @@ class Monitor(object):
                         while ret.Value:
                             # wait here until it is false 
                             ret = self.comm.Read(config.fault_tag)
-                            time.sleep(1)
+                            time.sleep(config.poll_rate)
                 except KeyboardInterrupt:
                     self.log("info", "Keyboard interrupt, shutting down")
                     self.read = False

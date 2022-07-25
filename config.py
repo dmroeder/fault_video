@@ -7,6 +7,9 @@ plc_slot = 0
 # BOOL tag that is 1 when a fault is present
 fault_tag = "fault_detected"
 
+# rate to check for fault condition
+poll_rate = 1.0
+
 # specify the desired video length (seconds).
 # this will determine the number of frames to be
 # kept in each camera buffer.  A 10 second clip
