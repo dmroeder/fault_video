@@ -38,3 +38,6 @@ acknowledge = True
 # maximum number videos to keep for each camera.
 # the oldest files will be purged
 max_files = 50
+
+# number of log files to keep
+log_count = 3
