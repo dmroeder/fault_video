@@ -54,6 +54,7 @@ class Monitor(object):
         self.log("debug", "v{}".format(fault_video.__version__))
         # log the configuration
         self.log("debug", "PLC IP/Slot - {}/{}".format(config.plc_ip, config.plc_slot))
+        self.log("debug", "Micro800 - {}".format(config.micro800))
         self.log("debug", "PLC Tag - {}".format(config.fault_tag))
         self.log("debug", "Video Length - {}".format(config.video_length))
         self.log("debug", "Resolution - {}x{}".format(*config.resolution))
@@ -82,7 +83,7 @@ class Monitor(object):
         """
         Loop, monitoring for faults
         """
-        with pylogix.PLC(config.plc_ip, config.plc_slot) as self.comm:
+        with pylogix.PLC(config.plc_ip, config.plc_slot, Micro800=config.micro800) as self.comm:
             self.log("info", "Starting PLC communications")
             print("\nPress CTRL+C to exit")
 

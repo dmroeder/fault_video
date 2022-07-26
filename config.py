@@ -4,6 +4,9 @@ plc_ip = "192.168.1.10"
 # which slot the processor is in
 plc_slot = 0
 
+# flag for when the controller is a Micro800
+micro800 = False
+
 # BOOL tag that is 1 when a fault is present
 fault_tag = "fault_detected"
 
