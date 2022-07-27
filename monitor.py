@@ -179,6 +179,24 @@ class Monitor(object):
             camera.save()
 
         self.get_newest_videos()
+        if config.video_path_tags:
+            self.send_path()
+        return
+
+    def send_path(self):
+        """
+        Write the latest video path to the PLC
+        """
+        for i, v in enumerate(self.newest_videos):
+            try:
+                tag = config.video_path_tags[i]
+                ret = self.comm.Write(tag, v)
+                if ret.Status != "Success":
+                    self.log("error", "Failed to write to path tag {}, {}".format(tag, ret.Status))
+            except:
+                tags = ','.join(str(x) for x in config.video_path_tags)
+                self.log("error", "Failed to write video paths to PLC - {}".format(tags))
+
         return
 
     def get_files(self, path, ext='', sort=False):

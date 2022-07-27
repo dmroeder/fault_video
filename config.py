@@ -44,3 +44,8 @@ max_files = 50
 
 # number of log files to keep
 log_count = 3
+
+# If you provide string tags (one tag for each camera), the
+# path to the most recent clip(s) will be written to the PLC
+# This should always be a list, even if you only have 1 camera
+video_path_tags = []
