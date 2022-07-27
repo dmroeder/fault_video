@@ -43,6 +43,8 @@ class Monitor(object):
         self.root.setLevel(os.environ.get("LOGLEVEL", "DEBUG"))
         self.root.addHandler(self.handler)
 
+        self.newest_videos = []
+
         self.setup()
         self.run()
 
@@ -198,14 +200,16 @@ class Monitor(object):
         Get the newest video files for each camera
         """
         vids = []
+        source = os.getcwd()
         for camera in self.cameras:
             path = "output/{}/".format(camera.cam_id)
             files = self.get_files(path, ext=".mp4", sort=True)
             if files:
-                s = "{}{}".format(path, files[0])
+                s = "{}\{}{}".format(source, path, files[0])
                 vids.append(os.path.normpath(s))
 
         self.purge_old_videos()
+        self.newest_videos = vids
         return
 
     def purge_old_videos(self):
