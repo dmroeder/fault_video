@@ -12,7 +12,9 @@ the file name) and the path to the camera.  Local cameras (built in web cams or 
 will be an integer.  In my case, I have a built in webcam and a USB camera, they are index
 0 and 1 respectively.  My particular model of IP camera is at the path:
 rtsp://ip_address/streaming/channels/1.  See your manufactures documentation for your specific
-cameras path.
+cameras path.  I like to use VLC to verify that I have the right address for my IP cameras.
+In VLC, go to Media > Open Network Stream, paste the path to your IP camera and play it.  If
+it successfully displays the camera, the path should work for recording the video.
 
 When launched, an output directory will be created, in side of it, a directory for each camera
 that was defined in the config file.  Video clips will be saved in the camera directories.
