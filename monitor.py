@@ -113,6 +113,7 @@ class Monitor(object):
                     ret = self.comm.Read(config.fault_tag)
                     time.sleep(config.poll_rate)
                     if ret.Value:
+                        self.log("info", "Fault detected")
                         # if it's true, save the fault
                         self.fault_occured()
 
