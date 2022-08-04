@@ -37,7 +37,7 @@ class Camera(threading.Thread):
             self.parent.log("info", "Camera {} started".format(self.camera))
             width = self._cap.get(3)
             height = self._cap.get(4)
-            self.parent.log("info", "Frame dimensions: {}x{}".format(width, height))
+            self.parent.log("info", "Frame dimensions: {}x{}".format(int(width), int(height)))
 
         while self._loop:
             if self.parent.read == False:
