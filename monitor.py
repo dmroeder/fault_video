@@ -36,6 +36,9 @@ class Monitor(object):
         self.comm = None
         self.read = True
 
+        if not os.path.exists("output/"):
+            os.mkdir("output")
+
         self.handler = logging.handlers.RotatingFileHandler('output/logjammin.log', maxBytes=10000, backupCount=config.log_count)
         self.formatter = logging.Formatter(fmt="%(asctime)s  %(levelname)s: %(message)s")
         self.handler.setFormatter(self.formatter)
