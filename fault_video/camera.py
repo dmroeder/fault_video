@@ -4,6 +4,7 @@ import datetime
 import threading
 import time
 
+
 class Camera(threading.Thread):
 
     def __init__(self, parent):
@@ -26,19 +27,23 @@ class Camera(threading.Thread):
         Capture frames and save them in a buffer of
         maximum size
         """
-        self._cap = cv2.VideoCapture(self.camera)
-        time.sleep(2)
+        # connect to the camera
+        connecting = True
+        while connecting:
+            self._cap = cv2.VideoCapture(self.camera)
+            time.sleep(2)
+            if self._cap.isOpened():
+                connecting = False
+            else:
+                self.parent.log("error", "Failed to open camera {}".format(self.camera))
+
         self._loop = True
+        self.parent.log("info", "Camera {} started".format(self.camera))
+        width = self._cap.get(3)
+        height = self._cap.get(4)
+        self.parent.log("info", "Frame dimensions: {}x{}".format(int(width), int(height)))
 
-        if not self._cap.isOpened():
-            self.parent.log("error", "Failed to open camera {}".format(self.camera))
-            self._loop = False
-        else:
-            self.parent.log("info", "Camera {} started".format(self.camera))
-            width = self._cap.get(3)
-            height = self._cap.get(4)
-            self.parent.log("info", "Frame dimensions: {}x{}".format(int(width), int(height)))
-
+        time.sleep(2)
         while self._loop:
             if self.parent.read == False:
                 self.stop()
