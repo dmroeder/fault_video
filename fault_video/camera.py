@@ -33,26 +33,29 @@ class Camera(threading.Thread):
             self._cap = cv2.VideoCapture(self.camera)
             time.sleep(2)
             if self._cap.isOpened():
-                connecting = False
+                self._loop = True
+                self.parent.log("info", "Camera {} started".format(self.camera))
+                width = self._cap.get(3)
+                height = self._cap.get(4)
+                self.parent.log("info", "Frame dimensions: {}x{}".format(int(width), int(height)))
             else:
                 self.parent.log("error", "Failed to open camera {}".format(self.camera))
 
-        self._loop = True
-        self.parent.log("info", "Camera {} started".format(self.camera))
-        width = self._cap.get(3)
-        height = self._cap.get(4)
-        self.parent.log("info", "Frame dimensions: {}x{}".format(int(width), int(height)))
+            time.sleep(2)
+            while self._loop:
+                if self.parent.read == False:
+                    self.stop()
+                self._frame = self._cap.read()[1]
 
-        time.sleep(2)
-        while self._loop:
-            if self.parent.read == False:
-                self.stop()
-            self._frame = self._cap.read()[1]
+                if self._frame is None:
+                    self.parent.log("error", "Camera returned no frame")
+                    self._buffer = []
+                    self._loop = False
 
-            if len(self._buffer) > self._max_frames:
-                self._buffer = self._buffer[1:] + [self._frame]
-            else:
-                self._buffer += [self._frame]
+                if len(self._buffer) > self._max_frames:
+                    self._buffer = self._buffer[1:] + [self._frame]
+                else:
+                    self._buffer += [self._frame]
 
     def save(self):
         """
